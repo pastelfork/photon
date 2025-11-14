@@ -1,20 +1,25 @@
-import { createConfig } from "ponder";
-
-import { ExampleContractAbi } from "./abis/ExampleContractAbi";
+import { createConfig, mergeAbis } from "ponder";
+import { StrategyProxyAbi } from "./abis/StrategyProxyAbi";
+import { StrategyImplAbi } from "./abis/StrategyImplAbi";
 
 export default createConfig({
+  database: {
+    kind: "postgres",
+    connectionString: process.env.DATABASE_URL!,
+  },
   chains: {
     mainnet: {
       id: 1,
       rpc: process.env.PONDER_RPC_URL_1!,
+      ws: process.env.PONDER_WS_RPC_URL_1!,
     },
   },
   contracts: {
-    ExampleContract: {
+    Strategy: {
       chain: "mainnet",
-      abi: ExampleContractAbi,
-      address: "0x0000000000000000000000000000000000000000",
-      startBlock: 1234567,
+      abi: mergeAbis([StrategyProxyAbi, StrategyImplAbi]),
+      address: JSON.parse(process.env.CONTRACTS!) as `0x${string}`[],
+      startBlock: Number(process.env.START_BLOCK!),
     },
   },
 });
